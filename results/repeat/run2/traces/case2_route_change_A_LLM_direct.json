@@ -1,0 +1,31 @@
+{
+  "case_id": "case2_route_change",
+  "group": "A_LLM_direct",
+  "scenario": "route_change",
+  "output": "基于提供的监控快照数据，针对“核心路由器到汇聚路由器 A 的链路（link-core-dist-a）出现中断”这一告警，分析结论如下：\n\n### 1. 链路状态分析\n*   **当前状态**：`utilization: 0.0` (利用率 0%)。\n    *   **解读**：该链路目前处于空闲或完全未使用的状态，并未检测到物理层或数据链路层的拥塞（如丢包、队列积压）。\n*   **延迟原因排查**：\n    *   **RTT 值**：`rtt_ms: null`。\n        *   **解读**：虽然 RTT 为 `null`，但在网络监控中，这通常意味着该链路尚未被正式标记为“可用”或“正常”，或者系统尚未采集到该链路的实时延迟数据（可能是由于链路未接入、设备未启动或配置缺失）。\n    *   **队列深度**：`avg_queue_depth: 0`, `peak_queue_depth: 0`。\n        *   **解读**：链路两端均无数据包堆积，说明没有拥塞现象。\n\n### 2. 综合结论\n*   **链路可用性判定**：**不可用（中断）**。\n    *   尽管当前利用率极低且队列深度为 0，但 `rtt_ms: null` 这一关键指标表明该链路在监控系统中尚未被正式激活或记录其状态。这通常意味着：\n        1.  **物理层故障**：链路可能已断开、损坏或处于维护状态。\n        2.  **配置缺失**：设备未正确配置为“可用”模式，或者链路名称/ID在监控系统中未被识别。\n        3.  **网络拓扑变更**：该链路可能因路由策略调整、接口状态改变等原因暂时被屏蔽。\n\n*   **用户感知影响**：虽然当前无拥塞和丢包，但 `rtt_ms: null` 的缺失会导致用户感知到的延迟无法准确反映真实网络状况，且系统未对该链路进行任何优化或恢复操作。\n\n### 3. 建议排查步骤\n1.  **检查物理层**：确认该链路是否真的已断开（如接口状态为 Down）。\n2.  **检查配置**：登录核心路由器，查看 `link-core-dist-a` 的接口状态和路由表，确认其是否被标记为“可用”或处于维护模式。\n3.  **网络拓扑验证**：对比监控快照中的 `_hint.available_links` 列表，确认该链路是否真的存在于可用的链路列表中（例如，如果它不在 `link-core-dist-a`, `link-core-dist-b`, `link-dist-a-sw1`... 等可用链表中，说明其未被纳入监控范围）。\n4.  **日志审计**：检查核心路由器的系统日志，寻找关于该链路状态变更或中断的记录。",
+  "trace": [],
+  "evaluation": {
+    "conclusion": {
+      "expected": "route_change_with_congestion",
+      "correct": true,
+      "generic_matched": [
+        "路由",
+        "故障",
+        "中断"
+      ],
+      "specific_matched": [
+        "路由",
+        "中断"
+      ]
+    },
+    "tools": {
+      "tool_calls": 0,
+      "used_metrics": false,
+      "used_delay_analysis": false,
+      "used_queue_calc": false,
+      "checked_target_link": false,
+      "tool_correctness": 0.0
+    },
+    "evidence_score": 0.67
+  }
+}

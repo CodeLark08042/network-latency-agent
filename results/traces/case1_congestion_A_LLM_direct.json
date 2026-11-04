@@ -1,0 +1,31 @@
+{
+  "case_id": "case1_congestion",
+  "group": "A_LLM_direct",
+  "scenario": "congestion",
+  "output": "根据提供的网络监控快照数据，针对从汇聚路由器 A 到接入交换机 1 号（link-dist-a-sw1）的路径出现严重延迟的分析如下：\n\n**1. 路径分析**\n*   **目标链路**：`link-core-dist-a` (核心 - 汇聚) -> `link-dist-a-sw1` (汇聚 - 接入)。\n*   **当前状态**：该链路处于高负载状态。\n    *   **带宽利用率**：0.55 (55%)，远低于 10GbE 理论上限（通常可达 90%+），但已接近满载。\n    *   **队列深度**：`avg_queue_depth: 50`, `peak_queue_depth: 200`。在 10GbE 高速链路中，平均队列深度达到 50 个数据包，峰值达 200 个，表明该链路存在严重的拥塞现象。\n    *   **到达率**：`arrival_rate_pps: 12000` (约 1.2 Gbps)。对于 10GbE 链路，理论最大吞吐量约为 10 Gbps，当前速率仅占 12% 左右，说明网络并未达到瓶颈。\n    *   **丢包率**：`packet_loss_percent: 0.01` (1%)，极低。\n\n**2. 关键异常指标对比**\n*   **RTT (往返时间)**：`rtt_ms: 8.0`。\n    *   正常 10GbE 链路 RTT 通常在 5-10ms 之间。\n    *   当前 RTT 为 8ms，略高于理论值，但考虑到拥塞和丢包，这是可接受的波动范围。\n*   **Packet Loss (丢包率)**：`packet_loss_percent: 0.01`。\n    *   极低，说明网络传输质量良好，没有因丢包导致的延迟累积。\n*   **队列深度异常**：`avg_queue_depth: 50`, `peak_queue_depth: 200`。\n    *   在带宽利用率仅 55% 的情况下，出现如此高的平均和峰值队列深度，说明该链路存在严重的拥塞（Congestion）。\n    *   **原因推断**：虽然到达率不高，但高队列深度通常意味着上游节点（如汇聚路由器 A）正在大量处理数据，导致下游交换机 1 号排队等待。\n\n**3. 综合结论**\n*   **根本原因**：**链路拥塞 (Link Congestion)**。\n    *   尽管当前到达率未达瓶颈，但 `peak_queue_depth` 高达 200 个数据包，且带宽利用率已达 55%。这表明汇聚路由器 A 正在大量处理数据，导致下游交换机 1 号处于高队列等待状态。\n*   **影响**：\n    *   **延迟 (Latency)**：虽然 RTT 仅 8ms（略高），但高队列深度和潜在的拥塞会导致实际端到端延迟显著增加，表现为网页加载缓慢、视频卡顿。\n    *   **吞吐量 (Throughput)**：带宽利用率低且队列深，限制了有效传输速率。\n\n**建议措施：**\n1.  **检查上游**：确认汇聚路由器 A 的负载是否过高，是否存在突发流量或拥塞导致的丢包/高队列。\n2.  **优化链路**：考虑在 `link-core-dist-a` 上实施 QoS（服务质量）策略，限制该链路的最大速率或平均速率，以缓解拥塞。\n3.  **监控告警**：持续监控 `peak_queue_depth` 和 `avg_queue_depth`，一旦超过阈值立即触发告警。",
+  "trace": [],
+  "evaluation": {
+    "conclusion": {
+      "expected": "congestion",
+      "correct": true,
+      "generic_matched": [
+        "拥塞",
+        "排队",
+        "利用率",
+        "queue"
+      ],
+      "specific_matched": [
+        "拥塞"
+      ]
+    },
+    "tools": {
+      "tool_calls": 0,
+      "used_metrics": false,
+      "used_delay_analysis": false,
+      "used_queue_calc": false,
+      "checked_target_link": false,
+      "tool_correctness": 0.0
+    },
+    "evidence_score": 0.33
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "case_id": "case2_route_change",
+  "group": "A_LLM_direct",
+  "scenario": "route_change",
+  "output": "基于提供的监控快照数据，针对“核心路由器到汇聚路由器 A 的链路（link-core-dist-a）出现中断”这一告警，分析结论如下：\n\n### 1. 链路状态分析\n*   **当前状态**：`utilization: 0.0` (利用率 0%)。\n    *   **解读**：虽然该链路的物理带宽为 10GbE（约 125Mbps），但在监控数据中，其 `utilization` 显示为 0%。这通常意味着链路处于空闲或完全未使用的状态，或者系统对该特定链路进行了某种特殊的“零负载”标记（例如：链路已关闭、被隔离、或该节点尚未建立连接）。\n    *   **对比**：与其他活跃链路（如 link-core-dist-b, link-dist-a-sw1 等）相比，link-core-dist-a 的利用率极低。\n\n*   **延迟原因推断**：\n    *   `rtt_ms: null`：表示该链路的实时往返时间（RTT）未记录或无法获取，这通常意味着链路处于不稳定状态、拥塞严重或物理连接中断。\n    *   `packet_loss_percent: 100.0`：这是最关键的指标。表示该链路**完全丢失数据包**。在正常的网络拓扑中，如果核心路由器（core-router）与汇聚路由器 A（dist-router-a）之间发生了物理断开、链路层故障或拥塞导致数据无法传输，通常会伴随极高的丢包率。\n    *   `avg_queue_depth: 0`：队列深度为 0，说明没有等待处理的数据，进一步佐证了链路处于“无负载”或“已中断”状态，而非正常的高吞吐量运行。\n\n### 2. 综合结论\n**告警原因判定：核心路由器与汇聚路由器 A 之间的物理链路（link-core-dist-a）发生了不可恢复的故障或完全断开。**\n\n**详细推演：**\n1.  **数据异常**：该链路的利用率仅为 0%，且 `packet_loss_percent` 高达 100%。在正常的网络监控中，如果核心路由器与汇聚路由器 A 之间存在物理连接（如通过光纤或网线），数据包应该能够正常传输并产生丢包率。\n2.  **排除其他因素**：\n    *   该链路与其他活跃链路（link-core-dist-b, link-dist-a-sw1 等）相比，利用率极低且无队列积压，说明它不是由拥塞引起的。\n    *   `rtt_ms: null` 表明链路处于非正常状态，无法通过正常的 Ping 测试验证连通性。\n3.  **结论**：该链路极有可能是物理层故障（如光纤断裂、端口被切断）、链路层错误配置导致完全断开，或者是核心路由器与汇聚路由器 A 之间的连接发生了不可逆的断开。\n\n**建议排查步骤：**\n1.  **物理层检查**：立即联系网络运维人员，确认 link-core-dist-a 的物理连接状态（是否物理断开）。\n2.  **路由协议验证**：使用 `ping` 命令测试核心路由器与汇聚路由器 A 之间的连通性，若 ping 不通则确认为链路故障。\n3.  **日志分析**：检查核心路由器的系统日志（如 OpenWrt/RouterOS 日志）中是否有关于“链路断开”、“接口错误”或“ARP 失败”的记录。",
+  "trace": [],
+  "evaluation": {
+    "conclusion": {
+      "expected": "route_change_with_congestion",
+      "correct": true,
+      "generic_matched": [
+        "路由",
+        "故障",
+        "中断",
+        "route"
+      ],
+      "specific_matched": [
+        "路由",
+        "中断"
+      ]
+    },
+    "tools": {
+      "tool_calls": 0,
+      "used_metrics": false,
+      "used_delay_analysis": false,
+      "used_queue_calc": false,
+      "checked_target_link": false,
+      "tool_correctness": 0.0
+    },
+    "evidence_score": 0.67
+  }
+}

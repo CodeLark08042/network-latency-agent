@@ -1,0 +1,86 @@
+{
+  "cases": [
+    {
+      "id": "case1_congestion",
+      "name": "链路拥塞导致延迟升高",
+      "scenario": "congestion",
+      "description": "汇聚路由器A到接入交换机1号链路利用率飙升至92%，用户反馈延迟显著增加",
+      "prompt": "校园网工程师报告：从汇聚路由器A到接入交换机1号（link-dist-a-sw1）的路径出现严重延迟，用户反馈网页加载缓慢、视频卡顿。请调查延迟原因。",
+      "target_link": "link-dist-a-sw1",
+      "expected_root_cause": "congestion",
+      "expected_evidence": [
+        "utilization > 0.8",
+        "queue_depth 显著增大",
+        "M/M/1 理论延迟与实测接近"
+      ],
+      "expected_conclusion": "链路拥塞导致排队延迟大幅增加",
+      "difficulty": "normal"
+    },
+    {
+      "id": "case2_route_change",
+      "name": "链路故障导致路由变更",
+      "scenario": "route_change",
+      "description": "核心路由器到汇聚路由器A的链路中断，流量切换到汇聚路由器B路径，导致B路径拥塞",
+      "prompt": "校园网监控系统告警：核心路由器到汇聚路由器A的链路（link-core-dist-a）出现中断。多个用户报告网络延迟增加。请调查当前网络状态和延迟原因。",
+      "target_link": "link-core-dist-b",
+      "expected_root_cause": "route_change_with_congestion",
+      "expected_evidence": [
+        "link-core-dist-a 完全中断（utilization=0, loss=100%）",
+        "link-core-dist-b 利用率升高",
+        "流量重新分配导致备用路径拥塞"
+      ],
+      "expected_conclusion": "主链路故障导致流量切换到备用路径，备用路径过载",
+      "difficulty": "medium"
+    },
+    {
+      "id": "case3_hardware_fault",
+      "name": "光模块故障导致高丢包",
+      "scenario": "packet_loss",
+      "description": "link-dist-a-sw2 光模块故障导致5%丢包率，但利用率不高",
+      "prompt": "用户报告：连接到接入交换机2号（link-dist-a-sw2）的网络非常不稳定，经常超时。但该链路利用率看起来并不高。请调查原因。",
+      "target_link": "link-dist-a-sw2",
+      "expected_root_cause": "hardware_fault",
+      "expected_evidence": [
+        "丢包率很高（5%）",
+        "利用率不高（~30%）",
+        "排队延迟不是主要原因",
+        "延迟来自重传而非拥塞"
+      ],
+      "expected_conclusion": "光模块故障导致高丢包率，丢包引发重传导致延迟增加",
+      "difficulty": "hard"
+    },
+    {
+      "id": "case4_incomplete_data",
+      "name": "监控数据不完整",
+      "scenario": "incomplete_data",
+      "description": "部分链路缺少监控数据，需要基于有限信息做出判断",
+      "prompt": "网络监控系统部分传感器故障，只有部分链路有数据。已知 link-core-dist-a 和 link-dist-a-sw1 有数据，其他链路数据缺失。用户报告从核心到接入交换机1号路径延迟高。请基于现有数据调查。",
+      "target_link": "link-dist-a-sw1",
+      "expected_root_cause": "congestion_partial_evidence",
+      "expected_evidence": [
+        "link-core-dist-a 利用率60%",
+        "link-dist-a-sw1 利用率50%，RTT 20ms",
+        "其他链路数据缺失"
+      ],
+      "expected_conclusion": "基于现有数据，链路存在一定拥塞，但由于数据不完整，无法完全确定",
+      "difficulty": "hard"
+    },
+    {
+      "id": "case5_normal",
+      "name": "正常状态验证",
+      "scenario": "normal",
+      "description": "所有链路指标正常，用于验证Agent不会误报问题",
+      "prompt": "新入职的网络工程师想了解一下当前校园网从核心路由器到接入交换机1号（link-dist-a-sw1）的链路状态是否正常。请检查并评估。",
+      "target_link": "link-dist-a-sw1",
+      "expected_root_cause": "normal",
+      "expected_evidence": [
+        "利用率低（~20%）",
+        "RTT正常（~5ms）",
+        "无丢包",
+        "队列深度小"
+      ],
+      "expected_conclusion": "链路状态正常，各项指标在合理范围内",
+      "difficulty": "easy"
+    }
+  ]
+}

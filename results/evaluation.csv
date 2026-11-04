@@ -1,0 +1,16 @@
+﻿case_id,case_name,scenario,group,expected_cause,conclusion_correct,specific_matched,evidence_completeness,tool_correctness,tool_calls,llm_calls,time_s,error,output_chars
+case1_congestion,链路拥塞导致延迟升高,congestion,A_LLM_direct,congestion,True,拥塞,0.33,0.0,0,1,42.06,,1484
+case1_congestion,链路拥塞导致延迟升高,congestion,B_Agent_Tools,congestion,True,拥塞,0.33,1.0,5,6,121.88,,2110
+case1_congestion,链路拥塞导致延迟升高,congestion,C_Agent_Tools_Skill,congestion,True,拥塞,0.33,1.0,5,6,107.99,,1731
+case2_route_change,链路故障导致路由变更,route_change,A_LLM_direct,route_change_with_congestion,True,路由|中断,0.67,0.0,0,1,45.3,,1378
+case2_route_change,链路故障导致路由变更,route_change,B_Agent_Tools,route_change_with_congestion,True,路由|中断,0.33,0.67,5,6,77.28,,1608
+case2_route_change,链路故障导致路由变更,route_change,C_Agent_Tools_Skill,route_change_with_congestion,True,路由|中断,0.67,1.0,5,6,110.6,,1650
+case3_hardware_fault,光模块故障导致高丢包,packet_loss,A_LLM_direct,hardware_fault,True,丢包,0.25,0.0,0,1,55.2,,1657
+case3_hardware_fault,光模块故障导致高丢包,packet_loss,B_Agent_Tools,hardware_fault,True,丢包,0.0,1.0,5,6,115.64,,2294
+case3_hardware_fault,光模块故障导致高丢包,packet_loss,C_Agent_Tools_Skill,hardware_fault,False,,0.0,1.0,5,6,107.78,,1179
+case4_incomplete_data,监控数据不完整,incomplete_data,A_LLM_direct,congestion_partial_evidence,True,缺失,1.0,0.0,0,1,53.81,,1739
+case4_incomplete_data,监控数据不完整,incomplete_data,B_Agent_Tools,congestion_partial_evidence,True,不完整|缺失,1.0,0.67,5,6,102.99,,2455
+case4_incomplete_data,监控数据不完整,incomplete_data,C_Agent_Tools_Skill,congestion_partial_evidence,True,缺失,0.67,0.67,5,6,99.15,,2557
+case5_normal,正常状态验证,normal,A_LLM_direct,normal,True,正常,0.0,0.0,0,1,38.08,,993
+case5_normal,正常状态验证,normal,B_Agent_Tools,normal,True,正常,0.0,1.0,5,6,86.6,,1897
+case5_normal,正常状态验证,normal,C_Agent_Tools_Skill,normal,True,正常,0.25,1.0,5,6,106.86,,1590

@@ -1,0 +1,32 @@
+{
+  "A_LLM_direct": {
+    "cases": 5,
+    "success_rate": 1.0,
+    "avg_evidence": 0.45,
+    "avg_tool_correctness": 0.0,
+    "avg_tool_calls": 0.0,
+    "avg_llm_calls": 1.0,
+    "avg_time_s": 46.9,
+    "errors": 0
+  },
+  "B_Agent_Tools": {
+    "cases": 5,
+    "success_rate": 1.0,
+    "avg_evidence": 0.332,
+    "avg_tool_correctness": 0.868,
+    "avg_tool_calls": 5.0,
+    "avg_llm_calls": 6.0,
+    "avg_time_s": 100.9,
+    "errors": 0
+  },
+  "C_Agent_Tools_Skill": {
+    "cases": 5,
+    "success_rate": 0.8,
+    "avg_evidence": 0.384,
+    "avg_tool_correctness": 0.934,
+    "avg_tool_calls": 5.0,
+    "avg_llm_calls": 6.0,
+    "avg_time_s": 106.5,
+    "errors": 0
+  }
+}

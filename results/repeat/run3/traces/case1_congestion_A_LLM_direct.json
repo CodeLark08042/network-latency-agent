@@ -1,0 +1,30 @@
+{
+  "case_id": "case1_congestion",
+  "group": "A_LLM_direct",
+  "scenario": "congestion",
+  "output": "根据提供的网络监控快照数据，针对从汇聚路由器 A 到接入交换机 1 号（link-dist-a-sw1）的路径出现严重延迟的分析如下：\n\n**1. 路径分析**\n*   **目标链路**：`link-core-dist-a` (核心路由器 -> dist-router-a) 和 `link-dist-a-sw1` (dist-router-a -> access-switch-1)。\n*   **当前状态**：该链路处于高负载状态。\n\n**2. 关键指标解读**\n*   **利用率过高**：`utilization` 高达 **0.92**（接近 100%）。这意味着汇聚路由器 A 到 dist-router-a 之间的带宽资源已被大量占用，无法为下游设备提供缓冲。\n*   **队列深度异常**：`avg_queue_depth` 为 **450**，而 `peak_queue_depth` 高达 **900**。这表明该链路存在严重的拥塞现象，数据包堆积严重。\n*   **延迟指标**：`rtt_ms` 为 **85.0 ms**（正常值通常在 1-20ms 之间），且 `packet_loss_percent` 为 **0.5%**（极低）。虽然 RTT 略高，但结合极低的丢包率来看，网络拥塞导致的延迟是主因。\n*   **带宽瓶颈**：目标链路总带宽为 1000 Mbps，当前利用率已达 92%，剩余带宽仅约 8 Mbps，不足以支撑高队列深度的数据流传输。\n\n**3. 结论**\n该路径出现严重延迟的根本原因是**汇聚路由器 A 到 dist-router-a 之间的链路拥塞**。具体表现为：\n*   **带宽资源耗尽**：目标链路利用率已达 92%，剩余带宽不足。\n*   **拥塞严重**：`avg_queue_depth` (450) 和 `peak_queue_depth` (900) 远超正常范围，表明大量数据包无法及时释放，导致网络拥塞。\n*   **影响结果**：高队列深度直接导致了传输延迟（RTT 85ms）和丢包率（仅 0.5%），从而引发用户感知到的网页加载缓慢和视频卡顿。\n\n**建议措施**：\n1.  立即检查汇聚路由器 A 的带宽资源是否被其他链路占用，或是否存在物理/逻辑拥塞。\n2.  对 `link-core-dist-a` 和 `link-dist-a-sw1` 进行流量整形（Flow Shaping）或 QoS 优化，限制最大发送速率。\n3.  检查 dist-router-a 的交换机端口状态，确认是否有其他链路占用该端口导致带宽被挤占。",
+  "trace": [],
+  "evaluation": {
+    "conclusion": {
+      "expected": "congestion",
+      "correct": true,
+      "generic_matched": [
+        "拥塞",
+        "利用率",
+        "queue"
+      ],
+      "specific_matched": [
+        "拥塞"
+      ]
+    },
+    "tools": {
+      "tool_calls": 0,
+      "used_metrics": false,
+      "used_delay_analysis": false,
+      "used_queue_calc": false,
+      "checked_target_link": false,
+      "tool_correctness": 0.0
+    },
+    "evidence_score": 0.67
+  }
+}

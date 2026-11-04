@@ -1,0 +1,15 @@
+# --- Core: Agent + CLI ---
+pydantic-ai>=2.0.0
+
+# --- Web backend (FastAPI) ---
+fastapi>=0.110
+uvicorn[standard]>=0.27
+python-dotenv>=1.0
+
+# --- Cloud model transport (DeepSeek, OpenAI-compatible) ---
+openai>=1.30
+
+# --- Optional: rebuild report figures and PDF ---
+matplotlib>=3.8
+Pillow>=10.0
+markdown>=3.5

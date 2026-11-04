@@ -1,0 +1,51 @@
+﻿
+======================================================================
+[case1_congestion] 链路拥塞导致延迟升高  (scenario=congestion)
+======================================================================
+  -> A_LLM_direct ... OK   | evidence=67% | tools=0% | 25s
+  -> B_Agent_Tools ... OK   | evidence=33% | tools=100% | 104s
+  -> C_Agent_Tools_Skill ... OK   | evidence=33% | tools=100% | 100s
+
+======================================================================
+[case2_route_change] 链路故障导致路由变更  (scenario=route_change)
+======================================================================
+  -> A_LLM_direct ... OK   | evidence=67% | tools=0% | 33s
+  -> B_Agent_Tools ... OK   | evidence=67% | tools=100% | 100s
+  -> C_Agent_Tools_Skill ... OK   | evidence=67% | tools=100% | 113s
+
+======================================================================
+[case3_hardware_fault] 光模块故障导致高丢包  (scenario=packet_loss)
+======================================================================
+  -> A_LLM_direct ... OK   | evidence=25% | tools=0% | 47s
+  -> B_Agent_Tools ... OK   | evidence=25% | tools=100% | 119s
+  -> C_Agent_Tools_Skill ... OK   | evidence=25% | tools=100% | 109s
+
+======================================================================
+[case4_incomplete_data] 监控数据不完整  (scenario=incomplete_data)
+======================================================================
+  -> A_LLM_direct ... FAIL | evidence=67% | tools=0% | 41s
+  -> B_Agent_Tools ... OK   | evidence=67% | tools=100% | 126s
+  -> C_Agent_Tools_Skill ... FAIL | evidence=67% | tools=100% | 113s
+
+======================================================================
+[case5_normal] 正常状态验证  (scenario=normal)
+======================================================================
+  -> A_LLM_direct ... OK   | evidence=0% | tools=0% | 22s
+  -> B_Agent_Tools ... OK   | evidence=25% | tools=100% | 82s
+  -> C_Agent_Tools_Skill ... OK   | evidence=25% | tools=100% | 107s
+
+CSV saved: E:\AIagentprog\network-latency-agent\results\evaluation.csv
+
+==============================================================================
+EVALUATION SUMMARY
+==============================================================================
+metric                    |    A_LLM_direct |   B_Agent_Tools | C_Agent_Tools_Skill 
+------------------------------------------------------------------------------------
+task_success_rate         |             0.8 |             1.0 |             0.8 
+avg_evidence              |           0.452 |           0.434 |           0.434 
+avg_tool_correctness      |             0.0 |             1.0 |             1.0 
+avg_tool_calls            |             0.0 |             5.0 |             5.0 
+avg_llm_calls             |             1.0 |             6.0 |             6.0 
+avg_time_s                |            33.6 |           106.1 |           108.2 
+errors                    |               0 |               0 |               0 
+==============================================================================

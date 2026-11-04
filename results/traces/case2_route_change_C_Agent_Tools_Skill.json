@@ -1,0 +1,81 @@
+{
+  "case_id": "case2_route_change",
+  "group": "C_Agent_Tools_Skill",
+  "scenario": "route_change",
+  "output": "## 校园网延迟调查报告\n\n### 1. 问题概述\n\n用户报告核心路由器到汇聚路由器 A（link-core-dist-a）的链路出现中断，导致多个用户网络延迟增加。经初步排查，该链路存在严重丢包和 RTT 缺失现象。\n\n### 2. 证据分析\n\n| 指标 | 数值/状态 | 判读依据 |\n|------|-----------|----------|\n| utilization | 0.0 (正常) | 链路利用率正常，非拥塞源 |\n| rtt_ms | null (缺失) | RTT 缺失无法判断时延异常 |\n| packet_loss_percent | 100.0% (完全丢包) | 严重丢包，可能由硬件故障或链路误码引起 |\n| avg_queue_depth | 0 | 队列深度为 0，无排队延迟 |\n| peak_queue_depth | 0 | 峰值队列深度也为 0 |\n\n**关键发现：**\n- link-core-dist-a 链路存在严重丢包（100%），但队列深度为 0\n- link-core-dist-b 链路利用率高 (88%)、RTT 正常、丢包低、队列深度大，可作为对比参考\n\n### 3. 假设分析\n\n| 假设 | 支持证据 | 反驳证据 |\n|------|----------|----------|\n| **链路拥塞导致 RTT 升高** | utilization=0.0 (正常) | utilization=0.88 (链路 B 高)，且 link-core-dist-a 利用率正常 |\n| **链路丢包引发重传导致 RTT 升高** | packet_loss_percent=100.0% | rtt_ms=null，RTT 缺失无法判断时延异常 |\n| **硬件故障导致链路中断** | packet_loss_percent=100.0%, avg_queue_depth=0 | link-core-dist-b 链路无中断迹象，且丢包低 |\n| **路由变更导致路径变长** | rtt_ms=45.0 (正常) | link-core-dist-a RTT 缺失，无法判断时延异常 |\n\n### 4. 结论\n\n**最可能的原因：链路拥塞（link-core-dist-b）与硬件故障（link-core-dist-a）共同导致网络延迟异常。**\n\n**置信度：** 50%\n- **证据不足**：RTT 缺失无法直接证明时延升高；链路 A 丢包严重但队列深度为 0，不支持“拥塞导致 RTT 升高”的假设；链路 B 利用率高、丢包低、队列深度大，可作为对比参考。\n\n### 5. 建议\n\n1. **立即检查 link-core-dist-a 链路硬件状态**：\n   - 使用 `get_link_metrics` 确认是否有误码或硬件故障\n   - 查看链路日志（如 available_links 中的 `_hint` 字段）\n   - 尝试恢复链路功能后重新测量 RTT\n\n2. **对比 link-core-dist-b 链路情况**：\n   - 确认 link-core-dist-b 是否因拥塞导致延迟升高\n   - 检查 link-core-server 链路（带宽 10Mbps，长度 0.1km）是否正常\n\n3. **排查路由变更**：\n   - 检查是否有路由变更导致路径变长\n   - 使用 `analyze_delay_components` 分解时延来源\n\n4. **优化监控指标**：\n   - 建议增加 RTT 测量频率，特别是在链路拥塞或丢包高发时段\n   - 关注队列深度变化，避免误判为拥塞\n\n5. **恢复测试**：\n   - 在确认硬件故障后，尝试恢复 link-core-dist-a 链路功能\n   - 验证延迟是否恢复正常\n\n---\n**调查完成时间：** 2024-01-15",
+  "trace": [
+    {
+      "tool_call": "list_network",
+      "args": {}
+    },
+    {
+      "tool": "list_network",
+      "result": "{\"links\": [{\"id\": \"link-core-dist-a\", \"from\": \"core-router\", \"to\": \"dist-router-a\", \"bandwidth_mbps\": 10000, \"length_km\": 0.5}, {\"id\": \"link-core-dist-b\", \"from\": \"core-router\", \"to\": \"dist-router-b\", \"bandwidth_mbps\": 10000, \"length_km\": 0.8}, {\"id\": \"link-dist-a-sw1\", \"from\": \"dist-router-a\", \"to\": \"access-switch-1\", \"bandwidth_mbps\": 1000, \"length_km\": 2.0}, {\"id\": \"link-dist-a-sw2\", \"from\": \"dist-router-a\", \"to\": \"access-switch-2\", \"bandwidth_mbps\": 1000, \"length_km\": 3.5}, {\"id\": \"link-dist-b-sw3\", \"from\": \"dist-router-b\", \"to\": \"access-switch-3\", \"bandwidth_mbps\": 1000, \"length_km\": 1.5}, {\"id\": \"link-core-server\", \"from\": \"core-router\", \"to\": \"server-farm\", \"bandwidth_mbps\": 10000, \"length_km\": 0.1}]}"
+    },
+    {
+      "tool_call": "get_link_metrics",
+      "args": {
+        "link_id": "link-core-dist-a"
+      }
+    },
+    {
+      "tool": "get_link_metrics",
+      "result": "{\"link_id\": \"link-core-dist-a\", \"from_node\": \"core-router\", \"to_node\": \"dist-router-a\", \"bandwidth_mbps\": 10000, \"length_km\": 0.5, \"interface_type\": \"10GbE\", \"utilization\": 0.0, \"rtt_ms\": null, \"packet_loss_percent\": 100.0, \"avg_queue_depth\": 0, \"peak_queue_depth\": 0, \"arrival_rate_pps\": 0, \"avg_packet_size_bytes\": 0, \"_hint\": {\"available_links\": [\"link-core-dist-a\", \"link-core-dist-b\", \"link-dist-a-sw1\", \"link-dist-a-sw2\", \"link-dist-b-sw3\", \"link-core-server\"]}}"
+    },
+    {
+      "tool_call": "get_link_metrics",
+      "args": {
+        "link_id": "link-core-dist-b"
+      }
+    },
+    {
+      "tool": "get_link_metrics",
+      "result": "{\"link_id\": \"link-core-dist-b\", \"from_node\": \"core-router\", \"to_node\": \"dist-router-b\", \"bandwidth_mbps\": 10000, \"length_km\": 0.8, \"interface_type\": \"10GbE\", \"utilization\": 0.88, \"rtt_ms\": 45.0, \"packet_loss_percent\": 0.3, \"avg_queue_depth\": 350, \"peak_queue_depth\": 700, \"arrival_rate_pps\": 15000, \"avg_packet_size_bytes\": 800, \"_hint\": {\"available_links\": [\"link-core-dist-a\", \"link-core-dist-b\", \"link-dist-a-sw1\", \"link-dist-a-sw2\", \"link-dist-b-sw3\", \"link-core-server\"]}}"
+    },
+    {
+      "tool_call": "analyze_delay_components",
+      "args": {
+        "link_id": "link-core-dist-a"
+      }
+    },
+    {
+      "tool": "analyze_delay_components",
+      "result": "{\"error\": \"Insufficient data for link 'link-core-dist-a' in scenario 'route_change'.\"}"
+    },
+    {
+      "tool_call": "calculate_queue_delay",
+      "args": {
+        "arrival_rate_pps": 0,
+        "service_rate_pps": 0
+      }
+    },
+    {
+      "tool": "calculate_queue_delay",
+      "result": "{\"error\": \"arrival_rate_pps must be positive.\"}"
+    }
+  ],
+  "evaluation": {
+    "conclusion": {
+      "expected": "route_change_with_congestion",
+      "correct": true,
+      "generic_matched": [
+        "路由",
+        "故障",
+        "中断"
+      ],
+      "specific_matched": [
+        "路由",
+        "中断"
+      ]
+    },
+    "tools": {
+      "tool_calls": 5,
+      "used_metrics": true,
+      "used_delay_analysis": true,
+      "used_queue_calc": true,
+      "checked_target_link": true,
+      "tool_correctness": 1.0
+    },
+    "evidence_score": 0.67
+  }
+}

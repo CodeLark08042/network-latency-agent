@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOC-01 · 校园网延迟调查 Copilot</title>
+  <meta name="description" content="面向校园网值班工程师的延迟调查 Agent：输入工单，查看工具取证过程与带置信度的结论。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="grid-layer" aria-hidden="true"></div>
+  <div class="scanline" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-tag">NOC-01</span>
+      <span class="brand-name">CAMPUS&nbsp;LATENCY&nbsp;COPILOT</span>
+    </div>
+    <div class="topbar-meta">
+      <span class="status-lamp" id="linkLamp" data-state="idle">LINK</span>
+      <span class="topbar-item" id="modeLabel">MODE · 探测中</span>
+      <span class="topbar-item">v0.1 MVP</span>
+    </div>
+  </header>
+
+  <main class="console">
+    <aside class="rail">
+      <section class="panel" aria-labelledby="ticketTitle">
+        <div class="panel-head">
+          <span class="panel-index">01</span>
+          <h2 id="ticketTitle">故障工单</h2>
+        </div>
+
+        <label class="field">
+          <span class="field-label">预置案例</span>
+          <select id="caseSelect">
+            <option value="">载入中…</option>
+          </select>
+          <span class="field-help" id="caseHelp">选择案例会自动填入场景与描述</span>
+        </label>
+
+        <label class="field">
+          <span class="field-label">模拟网络状态</span>
+          <select id="scenarioSelect">
+            <option value="congestion">congestion · 拥塞</option>
+            <option value="route_change">route_change · 路由变更</option>
+            <option value="packet_loss">packet_loss · 高丢包</option>
+            <option value="incomplete_data">incomplete_data · 数据缺失</option>
+            <option value="normal">normal · 正常</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field-label">工程师描述</span>
+          <textarea id="promptInput" rows="6" spellcheck="false">校园网工程师报告：从汇聚路由器A到接入交换机1号（link-dist-a-sw1）的路径出现严重延迟，用户反馈网页加载缓慢、视频卡顿。请调查延迟原因。</textarea>
+        </label>
+
+        <details class="field key-field">
+          <summary>接口密钥（可选）</summary>
+          <div class="key-row">
+            <input id="apiKeyInput" type="password" autocomplete="off" placeholder="sk-… 留空则使用服务端 .env" />
+            <button id="toggleKeyBtn" class="btn ghost" type="button" aria-pressed="false">显示</button>
+          </div>
+          <p class="field-help">仅发往本机后端，不写入任何日志。</p>
+        </details>
+
+        <div class="switch-row">
+          <label class="switch">
+            <input type="checkbox" id="skillToggle" checked />
+            <span class="switch-track" aria-hidden="true"></span>
+            <span class="switch-text">注入 Skill（关闭 = B 组对照）</span>
+          </label>
+        </div>
+
+        <div class="field">
+          <span class="field-label">工具预算 <b id="roundValue">5</b> 轮</span>
+          <input type="range" id="roundRange" min="1" max="8" step="1" value="5" />
+        </div>
+
+        <button id="runBtn" class="btn primary" type="button">
+          <span class="btn-label">开始调查</span>
+          <span class="btn-arrow" aria-hidden="true">→</span>
+        </button>
+        <p class="field-help run-hint" id="runHint">同一套 Agent 也能在 CLI 中运行：python -m src.main</p>
+      </section>
+
+      <section class="panel" aria-labelledby="healthTitle">
+        <div class="panel-head">
+          <span class="panel-index">02</span>
+          <h2 id="healthTitle">链路健康</h2>
+        </div>
+        <p class="field-help" id="healthCaption">读取当前场景的实时指标</p>
+        <ul class="link-list" id="linkList">
+          <li class="link-item placeholder">等待数据…</li>
+        </ul>
+      </section>
+    </aside>
+
+    <section class="stage">
+      <div class="readout" aria-label="运行读数">
+        <div class="readout-cell">
+          <span class="readout-key">SOURCE</span>
+          <span class="readout-val" id="readSource">—</span>
+        </div>
+        <div class="readout-cell">
+          <span class="readout-key">MODEL</span>
+          <span class="readout-val" id="readModel">—</span>
+        </div>
+        <div class="readout-cell">
+          <span class="readout-key">TOOL ROUNDS</span>
+          <span class="readout-val" id="readRounds">—</span>
+        </div>
+        <div class="readout-cell">
+          <span class="readout-key">CALLS</span>
+          <span class="readout-val" id="readCalls">—</span>
+        </div>
+        <div class="readout-cell">
+          <span class="readout-key">ELAPSED</span>
+          <span class="readout-val" id="readElapsed">—</span>
+        </div>
+      </div>
+
+      <p class="banner" id="banner" hidden></p>
+
+      <nav class="tabs" role="tablist" aria-label="结果视图">
+        <button class="tab is-active" role="tab" data-tab="report" aria-selected="true">调查报告</button>
+        <button class="tab" role="tab" data-tab="trace" aria-selected="false">工具轨迹</button>
+        <button class="tab" role="tab" data-tab="evidence" aria-selected="false">证据表</button>
+      </nav>
+
+      <div class="views">
+        <article class="view is-active" id="view-report" role="tabpanel" aria-live="polite">
+          <div class="empty-state" id="reportEmpty">
+            <p class="empty-title">等待一次调查</p>
+            <p class="empty-text">
+              左侧选择一个案例，然后点击「开始调查」。<br />
+              演示模式（GitHub Pages）会回放仓库中保存的真实 trace。
+            </p>
+          </div>
+          <div class="report-body" id="reportBody" hidden></div>
+        </article>
+
+        <div class="view" id="view-trace" role="tabpanel">
+          <ol class="trace-list" id="traceList">
+            <li class="trace-placeholder">尚无工具调用。</li>
+          </ol>
+        </div>
+
+        <div class="view" id="view-evidence" role="tabpanel">
+          <div id="evidenceBody" class="evidence-body">
+            <p class="trace-placeholder">尚无证据。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>课程项目 · 校园网延迟调查 Agent</span>
+    <span class="footer-dot">·</span>
+    <span id="footerMode">backend probe</span>
+    <span class="footer-dot">·</span>
+    <span>静态演示数据来自 <code>results/repeat/run4</code></span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

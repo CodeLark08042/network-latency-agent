@@ -1,0 +1,128 @@
+{
+  "network_name": "campus_network",
+  "description": "校园网上联链路模拟拓扑",
+  "topology": {
+    "nodes": [
+      {"id": "core-router", "name": "核心路由器", "type": "core_router"},
+      {"id": "dist-router-a", "name": "汇聚路由器A", "type": "distribution_router"},
+      {"id": "dist-router-b", "name": "汇聚路由器B", "type": "distribution_router"},
+      {"id": "access-switch-1", "name": "接入交换机1号", "type": "access_switch"},
+      {"id": "access-switch-2", "name": "接入交换机2号", "type": "access_switch"},
+      {"id": "access-switch-3", "name": "接入交换机3号", "type": "access_switch"},
+      {"id": "server-farm", "name": "服务器集群", "type": "server"}
+    ],
+    "links": [
+      {
+        "id": "link-core-dist-a",
+        "from": "core-router",
+        "to": "dist-router-a",
+        "bandwidth_mbps": 10000,
+        "length_km": 0.5,
+        "interface_type": "10GbE",
+        "propagation_speed_factor": 0.67
+      },
+      {
+        "id": "link-core-dist-b",
+        "from": "core-router",
+        "to": "dist-router-b",
+        "bandwidth_mbps": 10000,
+        "length_km": 0.8,
+        "interface_type": "10GbE",
+        "propagation_speed_factor": 0.67
+      },
+      {
+        "id": "link-dist-a-sw1",
+        "from": "dist-router-a",
+        "to": "access-switch-1",
+        "bandwidth_mbps": 1000,
+        "length_km": 2.0,
+        "interface_type": "1GbE",
+        "propagation_speed_factor": 0.67
+      },
+      {
+        "id": "link-dist-a-sw2",
+        "from": "dist-router-a",
+        "to": "access-switch-2",
+        "bandwidth_mbps": 1000,
+        "length_km": 3.5,
+        "interface_type": "1GbE",
+        "propagation_speed_factor": 0.67
+      },
+      {
+        "id": "link-dist-b-sw3",
+        "from": "dist-router-b",
+        "to": "access-switch-3",
+        "bandwidth_mbps": 1000,
+        "length_km": 1.5,
+        "interface_type": "1GbE",
+        "propagation_speed_factor": 0.67
+      },
+      {
+        "id": "link-core-server",
+        "from": "core-router",
+        "to": "server-farm",
+        "bandwidth_mbps": 10000,
+        "length_km": 0.1,
+        "interface_type": "10GbE",
+        "propagation_speed_factor": 0.67
+      }
+    ]
+  },
+  "scenarios": {
+    "normal": {
+      "description": "正常状态：各链路运行正常",
+      "link_metrics": {
+        "link-core-dist-a": {"utilization": 0.25, "rtt_ms": 2.0, "packet_loss_percent": 0.0, "avg_queue_depth": 5, "peak_queue_depth": 20, "arrival_rate_pps": 5000, "avg_packet_size_bytes": 800},
+        "link-core-dist-b": {"utilization": 0.30, "rtt_ms": 3.0, "packet_loss_percent": 0.0, "avg_queue_depth": 8, "peak_queue_depth": 30, "arrival_rate_pps": 6000, "avg_packet_size_bytes": 800},
+        "link-dist-a-sw1": {"utilization": 0.20, "rtt_ms": 5.0, "packet_loss_percent": 0.0, "avg_queue_depth": 3, "peak_queue_depth": 15, "arrival_rate_pps": 3000, "avg_packet_size_bytes": 600},
+        "link-dist-a-sw2": {"utilization": 0.35, "rtt_ms": 8.0, "packet_loss_percent": 0.0, "avg_queue_depth": 10, "peak_queue_depth": 40, "arrival_rate_pps": 4000, "avg_packet_size_bytes": 700},
+        "link-dist-b-sw3": {"utilization": 0.15, "rtt_ms": 4.0, "packet_loss_percent": 0.0, "avg_queue_depth": 2, "peak_queue_depth": 10, "arrival_rate_pps": 2000, "avg_packet_size_bytes": 500},
+        "link-core-server": {"utilization": 0.10, "rtt_ms": 1.0, "packet_loss_percent": 0.0, "avg_queue_depth": 1, "peak_queue_depth": 5, "arrival_rate_pps": 2000, "avg_packet_size_bytes": 1000}
+      }
+    },
+    "congestion": {
+      "description": "拥塞场景：link-dist-a-sw1 利用率飙升至90%，排队时延显著增加",
+      "link_metrics": {
+        "link-core-dist-a": {"utilization": 0.55, "rtt_ms": 8.0, "packet_loss_percent": 0.01, "avg_queue_depth": 50, "peak_queue_depth": 200, "arrival_rate_pps": 12000, "avg_packet_size_bytes": 800},
+        "link-core-dist-b": {"utilization": 0.35, "rtt_ms": 3.5, "packet_loss_percent": 0.0, "avg_queue_depth": 10, "peak_queue_depth": 35, "arrival_rate_pps": 6500, "avg_packet_size_bytes": 800},
+        "link-dist-a-sw1": {"utilization": 0.92, "rtt_ms": 85.0, "packet_loss_percent": 0.5, "avg_queue_depth": 450, "peak_queue_depth": 900, "arrival_rate_pps": 11000, "avg_packet_size_bytes": 700},
+        "link-dist-a-sw2": {"utilization": 0.40, "rtt_ms": 10.0, "packet_loss_percent": 0.0, "avg_queue_depth": 15, "peak_queue_depth": 50, "arrival_rate_pps": 4500, "avg_packet_size_bytes": 700},
+        "link-dist-b-sw3": {"utilization": 0.18, "rtt_ms": 4.5, "packet_loss_percent": 0.0, "avg_queue_depth": 3, "peak_queue_depth": 12, "arrival_rate_pps": 2200, "avg_packet_size_bytes": 500},
+        "link-core-server": {"utilization": 0.12, "rtt_ms": 1.0, "packet_loss_percent": 0.0, "avg_queue_depth": 2, "peak_queue_depth": 8, "arrival_rate_pps": 2500, "avg_packet_size_bytes": 1000}
+      }
+    },
+    "route_change": {
+      "description": "路由变更场景：link-core-dist-a 故障，流量切换到 link-core-dist-b，导致 dist-b 路径拥塞",
+      "link_metrics": {
+        "link-core-dist-a": {"utilization": 0.0, "rtt_ms": null, "packet_loss_percent": 100.0, "avg_queue_depth": 0, "peak_queue_depth": 0, "arrival_rate_pps": 0, "avg_packet_size_bytes": 0},
+        "link-core-dist-b": {"utilization": 0.88, "rtt_ms": 45.0, "packet_loss_percent": 0.3, "avg_queue_depth": 350, "peak_queue_depth": 700, "arrival_rate_pps": 15000, "avg_packet_size_bytes": 800},
+        "link-dist-a-sw1": {"utilization": 0.05, "rtt_ms": 3.0, "packet_loss_percent": 0.0, "avg_queue_depth": 1, "peak_queue_depth": 5, "arrival_rate_pps": 500, "avg_packet_size_bytes": 600},
+        "link-dist-a-sw2": {"utilization": 0.05, "rtt_ms": 3.0, "packet_loss_percent": 0.0, "avg_queue_depth": 1, "peak_queue_depth": 5, "arrival_rate_pps": 500, "avg_packet_size_bytes": 600},
+        "link-dist-b-sw3": {"utilization": 0.85, "rtt_ms": 40.0, "packet_loss_percent": 0.2, "avg_queue_depth": 300, "peak_queue_depth": 600, "arrival_rate_pps": 9500, "avg_packet_size_bytes": 700},
+        "link-core-server": {"utilization": 0.15, "rtt_ms": 1.5, "packet_loss_percent": 0.0, "avg_queue_depth": 2, "peak_queue_depth": 8, "arrival_rate_pps": 2500, "avg_packet_size_bytes": 1000}
+      }
+    },
+    "packet_loss": {
+      "description": "丢包场景：link-dist-a-sw2 光模块故障导致高丢包率，但利用率不高",
+      "link_metrics": {
+        "link-core-dist-a": {"utilization": 0.30, "rtt_ms": 3.0, "packet_loss_percent": 0.0, "avg_queue_depth": 8, "peak_queue_depth": 25, "arrival_rate_pps": 5500, "avg_packet_size_bytes": 800},
+        "link-core-dist-b": {"utilization": 0.32, "rtt_ms": 3.5, "packet_loss_percent": 0.0, "avg_queue_depth": 9, "peak_queue_depth": 30, "arrival_rate_pps": 6200, "avg_packet_size_bytes": 800},
+        "link-dist-a-sw1": {"utilization": 0.22, "rtt_ms": 6.0, "packet_loss_percent": 0.0, "avg_queue_depth": 4, "peak_queue_depth": 18, "arrival_rate_pps": 3200, "avg_packet_size_bytes": 600},
+        "link-dist-a-sw2": {"utilization": 0.30, "rtt_ms": 50.0, "packet_loss_percent": 5.0, "avg_queue_depth": 80, "peak_queue_depth": 200, "arrival_rate_pps": 4000, "avg_packet_size_bytes": 700},
+        "link-dist-b-sw3": {"utilization": 0.16, "rtt_ms": 4.0, "packet_loss_percent": 0.0, "avg_queue_depth": 2, "peak_queue_depth": 10, "arrival_rate_pps": 2100, "avg_packet_size_bytes": 500},
+        "link-core-server": {"utilization": 0.11, "rtt_ms": 1.0, "packet_loss_percent": 0.0, "avg_queue_depth": 1, "peak_queue_depth": 5, "arrival_rate_pps": 2100, "avg_packet_size_bytes": 1000}
+      }
+    },
+    "incomplete_data": {
+      "description": "数据不完整场景：部分链路缺少监控数据",
+      "link_metrics": {
+        "link-core-dist-a": {"utilization": 0.60, "rtt_ms": 15.0, "packet_loss_percent": 0.1, "avg_queue_depth": 80, "peak_queue_depth": 200, "arrival_rate_pps": 9000, "avg_packet_size_bytes": 800},
+        "link-core-dist-b": {"utilization": null, "rtt_ms": null, "packet_loss_percent": null, "avg_queue_depth": null, "peak_queue_depth": null, "arrival_rate_pps": null, "avg_packet_size_bytes": null},
+        "link-dist-a-sw1": {"utilization": 0.50, "rtt_ms": 20.0, "packet_loss_percent": 0.05, "avg_queue_depth": 60, "peak_queue_depth": 150, "arrival_rate_pps": 7000, "avg_packet_size_bytes": 700},
+        "link-dist-a-sw2": {"utilization": null, "rtt_ms": null, "packet_loss_percent": null, "avg_queue_depth": null, "peak_queue_depth": null, "arrival_rate_pps": null, "avg_packet_size_bytes": null},
+        "link-dist-b-sw3": {"utilization": null, "rtt_ms": null, "packet_loss_percent": null, "avg_queue_depth": null, "peak_queue_depth": null, "arrival_rate_pps": null, "avg_packet_size_bytes": null},
+        "link-core-server": {"utilization": 0.12, "rtt_ms": 1.0, "packet_loss_percent": 0.0, "avg_queue_depth": 2, "peak_queue_depth": 8, "arrival_rate_pps": 2500, "avg_packet_size_bytes": 1000}
+      }
+    }
+  }
+}
