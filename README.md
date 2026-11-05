@@ -2,6 +2,9 @@
 
 面向**校园网运维工程师**的 AI Agent：调查上联链路 RTT 异常，判断延迟是来自**排队拥塞**、**路由变更**还是**硬件故障**，并给出带证据与置信度的结论。
 
+- 代码仓库：<https://github.com/CodeLark08042/network-latency-agent>
+- 在线主页（静态演示）：<https://codelark08042.github.io/network-latency-agent/>
+
 ## 1. 项目简介与主要功能
 
 - 接收自然语言故障描述（例如"link-dist-a-sw1 延迟从 5 ms 涨到 85 ms"）
@@ -189,10 +192,10 @@ python -m backend.main
 
 GitHub Pages 不能运行 Python，因此线上只启用静态模式：
 
-1. 新建 **Public** 仓库并推送本项目；
+1. 仓库已公开：<https://github.com/CodeLark08042/network-latency-agent>
 2. 仓库 `Settings → Pages → Build and deployment → Deploy from a branch`；
 3. 分支选 `main`，目录选 `/docs`（本项目的静态站点就在 `docs/`）；
-4. 保存后访问 `https://<用户名>.github.io/<仓库名>/`。
+4. 在线主页：<https://codelark08042.github.io/network-latency-agent/>
 
 页面会自动探测后端；探测失败即切换为静态演示，并通过横幅与 `SOURCE` 读数说明数据来源。
 
