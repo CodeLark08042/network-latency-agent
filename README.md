@@ -208,7 +208,8 @@ GitHub Pages 不能运行 Python，因此线上只启用静态模式：
 | 完整工具调用 trace | `results/repeat/run4/*_C_Agent_Tools_Skill.json` | 5 个案例的 Agent+Tools+Skill 全量轨迹 |
 | 评测脚本 | `tests/evaluate.py` | 一条命令复现三组对照实验 |
 | 图表生成 | `scripts/make_figures.py` | 架构图、流程图、结果图 |
-| 运行截图 | `docs/screenshots/` | Agent 运行、工具轨迹、评测结果 |
+| 运行截图 | `docs/screenshots/screenshot_*.png` | Agent 运行、工具轨迹、评测结果 |
+| MVP 界面截图 | `docs/screenshots/mvp_*.png` | Web 工作台初始界面 / 调查报告 / 证据表（提交材料 07） |
 | 静态演示数据 | `docs/demo-data.json` | 由 `scripts/build_demo_data.py` 从真实 trace 生成 |
 | 课程过程记录 | `docs/04-课程过程记录.md` | 按阶段记录设计取舍、前端风格讨论、7 个真实问题与解法 |
 

@@ -296,8 +296,16 @@
       return;
     }
     var scenario = el.scenarioSelect.value;
-    var scenarioData = state.network.scenarios[scenario] || {};
-    var metrics = scenarioData.link_metrics || {};
+    var scenarioData, metrics;
+    if (Array.isArray(state.network.scenarios)) {
+      // 实时后端：GET /api/network?scenario=x 返回单场景扁平结构
+      scenarioData = { description: state.network.description };
+      metrics = state.network.metrics || {};
+    } else {
+      // 静态演示：demo-data.json 按场景嵌套
+      scenarioData = (state.network.scenarios || {})[scenario] || {};
+      metrics = scenarioData.link_metrics || {};
+    }
     var links = state.network.topology.links;
 
     el.healthCaption.textContent = scenarioData.description || "读取当前场景的实时指标";
@@ -355,7 +363,10 @@
     el.footerMode.textContent = "backend live";
     el.runHint.textContent = "后端在线：将调用 DeepSeek 与本地工具（无 Key 时自动降级）";
 
-    return Promise.all([fetchJson("api/cases"), fetchJson("api/network?scenario=congestion")])
+    return Promise.all([
+      fetchJson("api/cases"),
+      fetchJson("api/network?scenario=" + encodeURIComponent(el.scenarioSelect.value || "congestion"))
+    ])
       .then(function (results) {
         populateCases(results[0].cases || []);
         state.network = results[1];
@@ -489,7 +500,15 @@
   // ------------------------------------------------------------------ wiring
 
   el.caseSelect.addEventListener("change", function () { applyCase(el.caseSelect.value); });
-  el.scenarioSelect.addEventListener("change", renderLinks);
+  el.scenarioSelect.addEventListener("change", function () {
+    if (state.mode === "live") {
+      fetchJson("api/network?scenario=" + encodeURIComponent(el.scenarioSelect.value))
+        .then(function (data) { state.network = data; renderLinks(); })
+        .catch(function (error) { showBanner("网络指标加载失败：" + error.message, "error"); });
+    } else {
+      renderLinks();
+    }
+  });
   el.roundRange.addEventListener("input", function () { el.roundValue.textContent = el.roundRange.value; });
   el.runBtn.addEventListener("click", run);
 
