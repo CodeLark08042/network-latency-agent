@@ -205,11 +205,12 @@ GitHub Pages 不能运行 Python，因此线上只启用静态模式：
 | --- | --- | --- |
 | 多轮实验记录 | `results/repeat/`（run2 / run3 / run4） | 每次包含 15 条 trace + `evaluation.csv` + `summary.json` + 控制台日志 |
 | 最终实验汇总 | `results/repeat/run4/` | 报告第 5 章引用的数据来源 |
-| 完整工具调用 trace | `results/repeat/run4/traces/*_C_Agent_Tools_Skill.json` | 5 个案例的 Agent+Tools+Skill 全量轨迹 |
+| 完整工具调用 trace | `results/repeat/run4/*_C_Agent_Tools_Skill.json` | 5 个案例的 Agent+Tools+Skill 全量轨迹 |
 | 评测脚本 | `tests/evaluate.py` | 一条命令复现三组对照实验 |
 | 图表生成 | `scripts/make_figures.py` | 架构图、流程图、结果图 |
 | 运行截图 | `docs/screenshots/` | Agent 运行、工具轨迹、评测结果 |
 | 静态演示数据 | `docs/demo-data.json` | 由 `scripts/build_demo_data.py` 从真实 trace 生成 |
+| 课程过程记录 | `docs/04-课程过程记录.md` | 按阶段记录设计取舍、前端风格讨论、7 个真实问题与解法 |
 
 ## 14. 提交清单
 
@@ -225,6 +226,6 @@ GitHub Pages 不能运行 Python，因此线上只启用静态模式：
 ├── data/sample_data.json
 ├── tests/                    # cases.json + evaluate.py
 ├── results/                  # 对照实验、trace、汇总
-├── docs/                     # 三份设计文档 + 前端代码 + 图表 + 截图
+├── docs/                     # 四份文档 + 前端代码 + demo-data + 图表 + 截图
 └── scripts/                  # 图表、截图、PDF、demo-data 生成
 ```
