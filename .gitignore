@@ -20,3 +20,7 @@ Thumbs.db
 report.html
 results/investigation_report.md
 results/traces/smoke_skill.json
+
+# 课程报告：含个人信息，只随作业单独提交，不入库
+report.md
+report.pdf

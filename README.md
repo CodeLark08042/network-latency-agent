@@ -229,3 +229,5 @@ GitHub Pages 不能运行 Python，因此线上只启用静态模式：
 ├── docs/                     # 四份文档 + 前端代码 + demo-data + 图表 + 截图
 └── scripts/                  # 图表、截图、PDF、demo-data 生成
 ```
+
+> 说明：GitHub 仓库只放项目相关代码与文档。`report.md` / `report.pdf` 含个人信息，**不入库**（已在 `.gitignore` 中排除），随作业单独提交。ZIP 提交包里包含它们。
