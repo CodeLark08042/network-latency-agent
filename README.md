@@ -5,6 +5,8 @@
 - 代码仓库：<https://github.com/CodeLark08042/network-latency-agent>
 - 在线主页（静态演示）：<https://codelark08042.github.io/network-latency-agent/>
 
+小组成员：李开旭（23211239）与詹林（23271081）。前者管 Agent 和后端，后者管数据和前端，更细的分工写在报告"小组分工与各自贡献"一节。
+
 ## 1. 项目简介与主要功能
 
 - 接收自然语言故障描述（例如"link-dist-a-sw1 延迟从 5 ms 涨到 85 ms"）
@@ -216,7 +218,7 @@ GitHub Pages 不能运行 Python，因此线上只启用静态模式：
 ## 14. 提交清单
 
 ```text
-学号-姓名-校园网延迟调查Agent/
+23211239-李开旭-23271081-詹林-校园网延迟调查Agent/
 ├── report.pdf
 ├── README.md
 ├── requirements.txt

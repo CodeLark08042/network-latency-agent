@@ -1,6 +1,7 @@
 # 后端 HLD（High Level Design）：校园网延迟调查 Agent
 
 > 文档版本：v1.0（第一阶段 MVP）
+> 小组：李开旭（23211239）、詹林（23271081）　编写：李开旭　审阅：詹林
 > 对应实现：`backend/{main,llm_bridge,mock_engine}.py` + `src/{agent,tools,skills}.py`
 > 上游文档：[01-项目介绍文档](./01-项目介绍文档.md) ・ [02-前端界面设计文档](./02-前端界面设计文档.md)
 > 运行方式：`uvicorn backend.main:app --reload --port 8000`
@@ -69,7 +70,7 @@ flowchart LR
     BR -->|OpenAI 兼容| DS
 ```
 
-外部依赖只有两个：**DeepSeek API**（可缺省）与**本地 JSON 数据**。没有数据库、没有消息队列、没有缓存层——这是课堂级 MVP 的有意取舍。
+外部依赖只有两个：**DeepSeek API**（可缺省）与**本地 JSON 数据**。没有数据库、没有消息队列、没有缓存层。这是课堂级 MVP 的有意取舍。
 
 ---
 
@@ -438,7 +439,7 @@ GitHub Pages **不能运行 Python**。因此线上主页只启用静态模式�
 | `warning` | 降级原因原样透出 |
 | 自检 | `python -m backend.main` 打印 health 与 mock stats |
 
-暂未接入结构化日志与指标上报——MVP 阶段以"响应体自带可观测信息"为主。
+暂未接入结构化日志与指标上报，MVP 阶段以"响应体自带可观测信息"为主。
 
 ---
 
